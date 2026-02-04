@@ -1,0 +1,7 @@
+[
+  {
+    "Effect": "Allow",
+    "Action": ["s3:PutObject"],
+    "Resource": ["arn:aws:s3:::tdx2025-d-01/*"]
+  }
+]

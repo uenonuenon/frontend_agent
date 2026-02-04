@@ -1,0 +1,4 @@
+{
+  "PRESIGN_URL": "https://your-api.example.com/presign",
+  "PROCESS_URL": "https://your-api.example.com/process"
+}

@@ -1,0 +1,56 @@
+{
+  "api": {
+    "tdx2025dapigamplify": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "tdx2025dlambdaamplify01"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "tdx2025dlambdaamplify02"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    }
+  },
+  "function": {
+    "tdx2025dlambdaamplify01": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "tdx2025dlambdaamplify02": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_tdx2025dlambdaamplify01_bucket": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "tdx2025dlambdaamplify01"
+        }
+      ]
+    },
+    "AMPLIFY_function_tdx2025dlambdaamplify02_bedrockModelId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "tdx2025dlambdaamplify02"
+        }
+      ]
+    }
+  }
+}

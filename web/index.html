@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>アップロード → 処理（簡易UI + 整形表示）</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans JP";margin:24px;line-height:1.6}
+  h1{margin:0 0 12px;font-size:20px}
+  .box{border:1px solid #ddd;border-radius:10px;padding:14px;max-width:920px}
+  button{padding:8px 12px;border:0;border-radius:8px;background:#2563eb;color:#fff;font-weight:600;cursor:pointer}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  progress{width:100%;height:10px;margin-top:8px}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .muted{color:#666;font-size:13px}
+  pre{background:#f6f8fa;border:1px solid #e5e7eb;border-radius:8px;padding:10px;overflow:auto;max-height:420px}
+  .ok{color:#059669}.err{color:#dc2626}
+  /* 整形表示用 */
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+  @media (max-width:720px){ .cards{grid-template-columns:1fr} }
+  .card{border:1px solid #e5e7eb;border-radius:10px;padding:12px;background:#fff}
+  .card h4{margin:0 0 6px;font-size:15px}
+  .choices{margin:6px 0 0 18px}
+  .badge{display:inline-block;font-size:11px;background:#eef2ff;color:#3730a3;border-radius:999px;padding:2px 8px;margin-left:6px}
+  .ans{margin-top:6px;padding:6px 8px;border-radius:8px;background:#f0fdf4;border:1px solid #dcfce7}
+  .src{margin-top:6px;font-size:12px;color:#555}
+  details{margin-top:8px}
+  details > summary{cursor:pointer;user-select:none}
+  .toolbar{display:flex;gap:8px;align-items:center;margin-top:8px}
+</style>
+</head>
+<body>
+  <h1>ファイルをS3へアップ → サーバ処理</h1>
+  <div class="box">
+    <div class="row">
+      <input id="file" type="file" accept="image/*,.pdf">
+      <button id="go" disabled>アップロードして処理</button>
+      <button id="reset" type="button">リセット</button>
+      <label class="muted" style="margin-left:auto"><input type="checkbox" id="raw"> 生JSONで表示</label>
+    </div>
+    <div id="meta" class="muted" style="margin-top:6px">ファイル未選択</div>
+
+    <progress id="prog" value="0" max="100" style="display:none"></progress>
+    <div id="status" class="muted" style="margin-top:6px"></div>
+
+    <div class="toolbar">
+      <button id="expandAll" type="button" disabled>すべて展開</button>
+      <button id="collapseAll" type="button" disabled>すべて折りたたみ</button>
+    </div>
+
+    <h2 style="margin:16px 0 8px;font-size:16px">結果</h2>
+    <div id="pretty"></div>
+    <pre id="rawout" style="display:none">（ここに生JSONが表示されます）</pre>
+  </div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const file = $('file'), go = $('go'), reset = $('reset'), meta = $('meta');
+  const prog = $('prog'), status = $('status'), rawChk = $('raw');
+  const pretty = $('pretty'), rawout = $('rawout');
+  const expandAllBtn = $('expandAll'), collapseAllBtn = $('collapseAll');
+
+  // 設定は web/config.json から読み込み
+  let CONFIG = { PRESIGN_URL: '', PROCESS_URL: '' };
+
+  let selected = null, lastResponse = null;
+
+  // ====== UI helpers
+  const setStatus = (msg, cls='muted') => { status.textContent = msg; status.className = cls; };
+  const resetAll = () => {
+    file.value = ''; selected = null; go.disabled = true;
+    setStatus('', 'muted'); prog.style.display='none'; prog.value=0;
+    pretty.innerHTML = ''; rawout.textContent = '（ここに生JSONが表示されます）';
+    rawout.style.display = rawChk.checked ? 'block' : 'none';
+    expandAllBtn.disabled = true; collapseAllBtn.disabled = true;
+  };
+
+  // ====== networking helpers
+  async function postJSON(url, body){
+    const r = await fetch(url, { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(body) });
+    if (!r.ok) throw new Error(`POST ${url} -> ${r.status} ${r.statusText} ${await r.text().catch(()=> '')}`);
+    return r.json();
+  }
+  function putWithProgress(url, blob, contentType){
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('PUT', url);
+      xhr.setRequestHeader('Content-Type', contentType || 'application/octet-stream');
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          prog.style.display='block';
+          prog.value = Math.round(e.loaded / e.total * 100);
+        }
+      };
+      xhr.onload = () => (xhr.status >= 200 && xhr.status < 300) ? resolve() : reject(new Error(`PUT ${xhr.status} ${xhr.responseText}`));
+      xhr.onerror = () => reject(new Error('PUT network error'));
+      xhr.send(blob);
+    });
+  }
+
+  // ====== quiz parsing & rendering
+  function stripFence(s){
+    if (typeof s !== 'string') return s;
+    // ```json\n ... \n``` or ``` ... ```
+    return s.replace(/^```(?:json|JSON)?\s*/i, '').replace(/\s*```$/m, '');
+  }
+  function safeParse(s){
+    try { return JSON.parse(s); } catch { return null; }
+  }
+  function normalizeQuestions(x){
+    // x can be {questions:[...]}, or [...] directly
+    if (!x) return null;
+    const arr = Array.isArray(x) ? x : Array.isArray(x.questions) ? x.questions : null;
+    if (!arr) return null;
+    return arr.map(q => {
+      // normalize keys
+      return {
+        type: q.type || '',
+        question: q.question || q.title || '',
+        choices: q.choices || q.options || null,
+        answer: q.correctAnswer ?? q.answer ?? '',
+        explanation: q.explanation || q.reason || '',
+        sourceText: q.sourceText || q.source || ''
+      };
+    });
+  }
+  function renderPretty(resp){
+    pretty.innerHTML = '';
+    const qRaw = resp?.quiz;
+
+    // 1) 文字列ならコードフェンスを剥がしてパース
+    let parsed = (typeof qRaw === 'string') ? safeParse(stripFence(qRaw)) : (typeof qRaw === 'object' ? qRaw : null);
+
+    // 2) 正常化
+    const questions = normalizeQuestions(parsed);
+
+    if (!questions) {
+      // 整形できない→生表示にフォールバック
+      rawChk.checked = true;
+      rawout.style.display = 'block';
+      rawout.textContent = JSON.stringify(resp, null, 2);
+      expandAllBtn.disabled = true; collapseAllBtn.disabled = true;
+      return;
+    }
+
+    // 整形表示（答えは最初は隠す）
+    const frag = document.createDocumentFragment();
+    const head = document.createElement('div');
+    head.className = 'muted';
+    head.textContent = `問題数: ${questions.length}`;
+    frag.appendChild(head);
+
+    const wrap = document.createElement('div');
+    wrap.className = 'cards';
+
+    questions.forEach((q, i) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      const h = document.createElement('h4');
+      h.textContent = `${i+1}. ${q.question || '（無題）'}`;
+      if (q.type) {
+        const b = document.createElement('span');
+        b.className = 'badge'; b.textContent = q.type;
+        h.appendChild(b);
+      }
+      card.appendChild(h);
+
+      if (Array.isArray(q.choices) && q.choices.length){
+        const ul = document.createElement('ul'); ul.className = 'choices';
+        q.choices.forEach(c => {
+          const li = document.createElement('li');
+          li.textContent = c;
+          ul.appendChild(li);
+        });
+        card.appendChild(ul);
+      }
+
+      const details = document.createElement('details');
+      const summary = document.createElement('summary');
+      summary.textContent = '答えを表示';
+      details.appendChild(summary);
+
+      if (q.answer){
+        const ans = document.createElement('div');
+        ans.className = 'ans';
+        ans.innerHTML = `<b>正答:</b> ${escapeHtml(q.answer)}`;
+        details.appendChild(ans);
+      }
+      if (q.explanation){
+        const ex = document.createElement('div');
+        ex.className = 'src';
+        ex.innerHTML = `<b>解説:</b> ${escapeHtml(q.explanation)}`;
+        details.appendChild(ex);
+      }
+      if (q.sourceText){
+        const st = document.createElement('div');
+        st.className = 'src';
+        st.innerHTML = `<b>出典本文:</b> ${escapeHtml(q.sourceText)}`;
+        details.appendChild(st);
+      }
+      card.appendChild(details);
+      wrap.appendChild(card);
+    });
+
+    frag.appendChild(wrap);
+    pretty.appendChild(frag);
+
+    expandAllBtn.disabled = false; collapseAllBtn.disabled = false;
+
+    // 生JSONはオフ
+    rawout.style.display = rawChk.checked ? 'block' : 'none';
+    rawout.textContent = JSON.stringify(resp, null, 2);
+  }
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));
+  }
+
+  // ====== events
+  file.addEventListener('change', () => {
+    selected = file.files?.[0] || null;
+    meta.textContent = selected ? `${selected.name} (${selected.type || 'application/octet-stream'}, ${selected.size.toLocaleString()} bytes)` : 'ファイル未選択';
+    go.disabled = !selected;
+  });
+  reset.addEventListener('click', resetAll);
+  rawChk.addEventListener('change', () => {
+    if (!lastResponse) return;
+    rawout.style.display = rawChk.checked ? 'block' : 'none';
+  });
+  expandAllBtn.addEventListener('click', () => {
+    document.querySelectorAll('#pretty details').forEach(d => d.open = true);
+  });
+  collapseAllBtn.addEventListener('click', () => {
+    document.querySelectorAll('#pretty details').forEach(d => d.open = false);
+  });
+
+  go.addEventListener('click', async () => {
+    if (!selected) { setStatus('ファイルを選択してください', 'err'); return; }
+    if (!CONFIG.PRESIGN_URL || !CONFIG.PROCESS_URL){
+      setStatus('config.json が未設定です', 'err'); return;
+    }
+    try{
+      // ① presign
+      setStatus('① 署名付きURL取得中…');
+      const presign = await postJSON(CONFIG.PRESIGN_URL, { filename: selected.name, contentType: selected.type });
+
+      // ② PUT
+      setStatus('② S3にアップロード中…');
+      await putWithProgress(presign.url, selected, selected.type);
+
+      // ③ process
+      setStatus('③ サーバ処理中…');
+      const resp = await postJSON(CONFIG.PROCESS_URL, { bucket: presign.bucket, key: presign.key });
+
+      lastResponse = resp;
+      setStatus('完了しました ✅', 'ok');
+      renderPretty(resp);
+    }catch(e){
+      console.error(e);
+      setStatus(e.message || 'エラーが発生しました', 'err');
+    }finally{
+      setTimeout(()=>{ prog.style.display='none'; }, 800);
+    }
+  });
+
+  // init
+  resetAll();
+  // 設定読み込み
+  fetch('config.json', { cache: 'no-store' })
+    .then(r => r.ok ? r.json() : null)
+    .then(cfg => { if (cfg){ CONFIG = cfg; } })
+    .catch(() => {})
+    .finally(() => {
+      // noop
+    });
+})();
+</script>
+</body>
+</html>

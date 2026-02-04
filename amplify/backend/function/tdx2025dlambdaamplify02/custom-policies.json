@@ -1,0 +1,12 @@
+[
+  {
+    "Effect": "Allow",
+    "Action": ["s3:GetObject", "s3:HeadObject"],
+    "Resource": ["arn:aws:s3:::tdx2025-d-01/*"]
+  },
+  {
+    "Effect": "Allow",
+    "Action": ["bedrock:InvokeModel"],
+    "Resource": ["*"]
+  }
+]

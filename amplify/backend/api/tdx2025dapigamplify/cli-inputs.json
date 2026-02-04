@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "paths": {
+    "/presign": {
+      "name": "/presign",
+      "lambdaFunction": "tdx2025dlambdaamplify01",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/process": {
+      "name": "/process",
+      "lambdaFunction": "tdx2025dlambdaamplify02",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}

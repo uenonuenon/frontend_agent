@@ -1,0 +1,9 @@
+{
+  "lambdaLayers": [],
+  "environmentVariableList": [
+    {
+      "cloudFormationParameterName": "bedrockModelId",
+      "environmentVariableName": "BEDROCK_MODEL_ID"
+    }
+  ]
+}

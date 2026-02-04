@@ -1,0 +1,25 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-frontendagent-dev-4a0c5-authRole",
+      "UnauthRoleArn": "arn:aws:iam::975050325676:role/amplify-frontendagent-dev-4a0c5-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::975050325676:role/amplify-frontendagent-dev-4a0c5-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-frontendagent-dev-4a0c5-deployment",
+      "UnauthRoleName": "amplify-frontendagent-dev-4a0c5-unauthRole",
+      "StackName": "amplify-frontendagent-dev-4a0c5",
+      "StackId": "arn:aws:cloudformation:us-west-2:975050325676:stack/amplify-frontendagent-dev-4a0c5/7e70bc80-01b2-11f1-a602-0a9ebf78ef77",
+      "AmplifyAppId": "d3cddmds1kz3p1"
+    },
+    "categories": {
+      "function": {
+        "tdx2025dlambdaamplify01": {
+          "bucket": "tdx2025-d-01"
+        },
+        "tdx2025dlambdaamplify02": {
+          "bedrockModelId": "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
+        }
+      }
+    }
+  }
+}
