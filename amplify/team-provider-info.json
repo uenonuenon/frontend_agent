@@ -14,11 +14,21 @@
     "categories": {
       "function": {
         "tdx2025dlambdaamplify01": {
-          "bucket": "tdx2025-d-01"
+          "bucket": "tdx2025-d-01",
+          "deploymentBucketName": "amplify-frontendagent-dev-4a0c5-deployment",
+          "s3Key": "amplify-builds/tdx2025dlambdaamplify01-5439796f645a42444c55-build.zip"
         },
         "tdx2025dlambdaamplify02": {
-          "bedrockModelId": "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
+          "bedrockModelId": "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+          "deploymentBucketName": "amplify-frontendagent-dev-4a0c5-deployment",
+          "s3Key": "amplify-builds/tdx2025dlambdaamplify02-75654a6471502b425339-build.zip"
         }
+      },
+      "api": {
+        "tdx2025dapigamplify": {}
+      },
+      "hosting": {
+        "S3AndCloudFront": {}
       }
     }
   }

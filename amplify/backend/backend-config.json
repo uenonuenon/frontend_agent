@@ -35,6 +35,12 @@
       "service": "Lambda"
     }
   },
+  "hosting": {
+    "S3AndCloudFront": {
+      "providerPlugin": "awscloudformation",
+      "service": "S3AndCloudFront"
+    }
+  },
   "parameters": {
     "AMPLIFY_function_tdx2025dlambdaamplify01_bucket": {
       "usedBy": [
@@ -44,7 +50,39 @@
         }
       ]
     },
+    "AMPLIFY_function_tdx2025dlambdaamplify01_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "tdx2025dlambdaamplify01"
+        }
+      ]
+    },
+    "AMPLIFY_function_tdx2025dlambdaamplify01_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "tdx2025dlambdaamplify01"
+        }
+      ]
+    },
     "AMPLIFY_function_tdx2025dlambdaamplify02_bedrockModelId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "tdx2025dlambdaamplify02"
+        }
+      ]
+    },
+    "AMPLIFY_function_tdx2025dlambdaamplify02_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "tdx2025dlambdaamplify02"
+        }
+      ]
+    },
+    "AMPLIFY_function_tdx2025dlambdaamplify02_s3Key": {
       "usedBy": [
         {
           "category": "function",
