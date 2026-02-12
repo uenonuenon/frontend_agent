@@ -1,0 +1,10 @@
+{
+  "name": "frontend-agent-static",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static frontend for Amplify Hosting (S3 & CloudFront)",
+  "scripts": {
+    "build": "mkdir -p dist && rsync -a --delete web/ dist/",
+    "start": "python3 -m http.server -d dist 8080"
+  }
+}

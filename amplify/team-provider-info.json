@@ -21,7 +21,7 @@
         "tdx2025dlambdaamplify02": {
           "bedrockModelId": "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
           "deploymentBucketName": "amplify-frontendagent-dev-4a0c5-deployment",
-          "s3Key": "amplify-builds/tdx2025dlambdaamplify02-75654a6471502b425339-build.zip"
+          "s3Key": "amplify-builds/tdx2025dlambdaamplify02-6f4c552f643952433473-build.zip"
         }
       },
       "api": {
