@@ -8,12 +8,5 @@
     "Effect": "Allow",
     "Action": ["bedrock:InvokeModel"],
     "Resource": ["*"]
-  },
-  {
-    "Effect": "Allow",
-    "Action": [
-      "textract:DetectDocumentText"
-    ],
-    "Resource": ["*"]
   }
 ]

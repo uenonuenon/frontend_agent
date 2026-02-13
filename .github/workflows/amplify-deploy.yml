@@ -1,0 +1,38 @@
+name: Amplify Backend Deploy
+
+on:
+  push:
+    branches: [ main, 20260212 ]
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Amplify CLI
+        run: npm i -g @aws-amplify/cli@^14
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-west-2' }}
+
+      - name: Pull Amplify Env
+        run: |
+          amplify pull --appId ${{ secrets.AMPLIFY_APP_ID }} --envName ${{ secrets.AMPLIFY_ENV || 'dev' }} --yes --amplify "{"projectName":"frontendagent","envName":"${{ secrets.AMPLIFY_ENV || 'dev' }}","defaultEditor":"code"}"
+
+      - name: Show status
+        run: amplify status --details
+
+      - name: Push backend
+        run: amplify push --yes

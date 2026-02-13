@@ -1,0 +1,38 @@
+[
+  {
+    "Effect": "Allow",
+    "Action": [
+      "bedrock-agentcore:InvokeAgentRuntime"
+    ],
+    "Resource": ["*"]
+  },
+  {
+    "Effect": "Allow",
+    "Action": [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:HeadObject"
+    ],
+    "Resource": [
+      "arn:aws:s3:::tdx2025-d-01/*"
+    ]
+  },
+  {
+    "Effect": "Allow",
+    "Action": [
+      "lambda:InvokeFunction"
+    ],
+    "Resource": [
+      "*"
+    ]
+  },
+  {
+    "Effect": "Allow",
+    "Action": [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ],
+    "Resource": ["*"]
+  }
+]

@@ -1,4 +1,5 @@
 {
   "PRESIGN_URL": "https://wpvy5d9xk5.execute-api.us-west-2.amazonaws.com/dev/presign",
-  "PROCESS_URL": "https://wpvy5d9xk5.execute-api.us-west-2.amazonaws.com/dev/process"
+  "PROCESS_URL": "https://wpvy5d9xk5.execute-api.us-west-2.amazonaws.com/dev/process",
+  "AGENTCORE_URL": "https://wpvy5d9xk5.execute-api.us-west-2.amazonaws.com/dev/agentcore"
 }
