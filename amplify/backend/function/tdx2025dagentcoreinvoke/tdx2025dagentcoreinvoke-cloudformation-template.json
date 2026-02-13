@@ -16,12 +16,23 @@
     "s3Key": {
       "Type": "String"
     },
-    "bedrockModelId": {
+    "agentcoreArn": {
       "Type": "String"
     },
-    "agentcoreRuntimeArn": {
+    "agentcoreQualifier": {
       "Type": "String",
-      "Default": "arn:aws:bedrock-agentcore:us-west-2:975050325676:runtime/agentcore_app5-hzJtlH2rgJ"
+      "Default": ""
+    },
+    "invocationMode": {
+      "Type": "String",
+      "Default": "sdk"
+    },
+    "jobsBucket": {
+      "Type": "String"
+    },
+    "jobsPrefix": {
+      "Type": "String",
+      "Default": "jobs/"
     }
   },
   "Conditions": {
@@ -50,16 +61,16 @@
             "Ref": "s3Key"
           }
         },
-        "Handler": "index.lambda_handler",
+        "Handler": "index.handler",
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "tdx2025dlambdaamplify02",
+            "tdx2025dagentcoreinvoke",
             {
               "Fn::Join": [
                 "",
                 [
-                  "tdx2025dlambdaamplify02",
+                  "tdx2025dagentcoreinvoke",
                   "-",
                   {
                     "Ref": "env"
@@ -77,11 +88,20 @@
             "REGION": {
               "Ref": "AWS::Region"
             },
-            "BEDROCK_MODEL_ID": {
-              "Ref": "bedrockModelId"
+            "AGENTCORE_ARN": {
+              "Ref": "agentcoreArn"
             },
-            "AGENTCORE_RUNTIME_ARN": {
-              "Ref": "agentcoreRuntimeArn"
+            "AGENTCORE_QUALIFIER": {
+              "Ref": "agentcoreQualifier"
+            },
+            "INVOCATION_MODE": {
+              "Ref": "invocationMode"
+            },
+            "JOBS_BUCKET": {
+              "Ref": "jobsBucket"
+            },
+            "JOBS_PREFIX": {
+              "Ref": "jobsPrefix"
             }
           }
         },
@@ -92,31 +112,12 @@
           ]
         },
         "Runtime": "python3.12",
-        "Layers": [],
-        "Timeout": 120
+        "Timeout": 300
       }
     },
     "LambdaExecutionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
-        "RoleName": {
-          "Fn::If": [
-            "ShouldNotCreateEnvResources",
-            "frontendagentLambdaRolee97c8b90",
-            {
-              "Fn::Join": [
-                "",
-                [
-                  "frontendagentLambdaRolee97c8b90",
-                  "-",
-                  {
-                    "Ref": "env"
-                  }
-                ]
-              ]
-            }
-          ]
-        },
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
@@ -188,6 +189,16 @@
             {
               "Effect": "Allow",
               "Action": [
+                "bedrock-agentcore:InvokeAgentRuntime"
+              ],
+              "Resource": [
+                "*"
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:PutObject",
                 "s3:GetObject",
                 "s3:HeadObject"
               ],
@@ -198,7 +209,18 @@
             {
               "Effect": "Allow",
               "Action": [
-                "bedrock:InvokeModel"
+                "lambda:InvokeFunction"
+              ],
+              "Resource": [
+                "*"
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
               ],
               "Resource": [
                 "*"

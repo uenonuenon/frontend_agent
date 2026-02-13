@@ -14,6 +14,13 @@
       "permissions": {
         "setting": "open"
       }
+    },
+    "/agentcore": {
+      "name": "/agentcore",
+      "lambdaFunction": "tdx2025dagentcoreinvoke",
+      "permissions": {
+        "setting": "open"
+      }
     }
   }
 }

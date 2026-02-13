@@ -24,9 +24,7 @@
 	{
 		"AllowedHeaders": ["*"],
 		"AllowedMethods": ["PUT", "GET", "HEAD"],
-		"AllowedOrigins": ["*"],
-		"ExposeHeaders": ["ETag"],
-		"MaxAgeSeconds": 3000
+		 - バックエンド③: AgentCore 呼び出し（Python Lambda 雛形） [backend/agentcore_invoke/app.py](backend/agentcore_invoke/app.py)
 	}
 ]
 ```
@@ -57,19 +55,13 @@ amplify init
 - 実行ランタイム: Node.js 20
 - 環境変数:
 	- BEDROCK_MODEL_ID=anthropic.claude-3-7-sonnet-20250219-v1:0 （例）
-	- ※ AWS_REGION は Lambda の予約キーのため「設定しない」(自動で利用可能)
-- 必要権限（例）:
 	- s3:GetObject, s3:HeadObject（対象: arn:aws:s3:::BUCKET/*）
 	- bedrock:InvokeModel（対象: 使うモデルの ARN に限定推奨）
-
 Amplify CLI の例:
 
 ```
-amplify add function
-# → presign 関数を作成（Node.js 20）
 #   その後、作成された関数ディレクトリに [backend/presign/index.mjs](backend/presign/index.mjs) と同内容を配置
 #   環境変数は BUCKET のみ設定（AWS_REGION は設定しない）、S3 PutObject 権限を付与
-
 amplify add function
 # → process 関数を作成（Node.js 20）
 #   その後、作成された関数ディレクトリに [backend/process/index.mjs](backend/process/index.mjs) と同内容を配置
@@ -87,8 +79,6 @@ amplify add function
 			"Effect": "Allow",
 			"Action": ["bedrock:InvokeModel"],
 			"Resource": "arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-3-7-sonnet-20250219-v1:0"
-		}
-	]
 }
 ```
 ```
@@ -108,6 +98,7 @@ amplify add function
 amplify add api
 # → REST を選択
 #   /presign → presign Lambda（POST）
+		  - AGENTCORE_URL: API の /agentcore/invoke エンドポイント
 #   /process → process Lambda（POST）
 ```
 
@@ -129,10 +120,6 @@ amplify add hosting
 amplify publish
 ```
 
-公開後、静的サイトが配信されます。初回は web/config.json の URL を正しく設定してください。
-
-
-## 6) 使い方
 
 1. サイトを開く
 2. 画像（jpg/png）または PDF を選択

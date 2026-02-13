@@ -5,5 +5,10 @@
       "cloudFormationParameterName": "bedrockModelId",
       "environmentVariableName": "BEDROCK_MODEL_ID"
     }
+    ,
+    {
+      "cloudFormationParameterName": "agentcoreRuntimeArn",
+      "environmentVariableName": "AGENTCORE_RUNTIME_ARN"
+    }
   ]
 }

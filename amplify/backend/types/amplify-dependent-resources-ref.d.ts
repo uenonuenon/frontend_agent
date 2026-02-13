@@ -7,6 +7,13 @@ export type AmplifyDependentResourcesAttributes = {
     }
   },
   "function": {
+    "tdx2025dagentcoreinvoke": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    },
     "tdx2025dlambdaamplify01": {
       "Arn": "string",
       "LambdaExecutionRole": "string",

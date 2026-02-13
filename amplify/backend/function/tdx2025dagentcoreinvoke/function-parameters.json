@@ -1,0 +1,10 @@
+{
+  "lambdaLayers": [],
+  "environmentVariableList": [
+    { "cloudFormationParameterName": "agentcoreArn", "environmentVariableName": "AGENTCORE_ARN" },
+    { "cloudFormationParameterName": "agentcoreQualifier", "environmentVariableName": "AGENTCORE_QUALIFIER" },
+    { "cloudFormationParameterName": "invocationMode", "environmentVariableName": "INVOCATION_MODE" },
+    { "cloudFormationParameterName": "jobsBucket", "environmentVariableName": "JOBS_BUCKET" },
+    { "cloudFormationParameterName": "jobsPrefix", "environmentVariableName": "JOBS_PREFIX" }
+  ]
+}

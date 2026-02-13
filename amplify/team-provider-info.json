@@ -21,7 +21,17 @@
         "tdx2025dlambdaamplify02": {
           "bedrockModelId": "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
           "deploymentBucketName": "amplify-frontendagent-dev-4a0c5-deployment",
-          "s3Key": "amplify-builds/tdx2025dlambdaamplify02-6f4c552f643952433473-build.zip"
+          "s3Key": "amplify-builds/tdx2025dlambdaamplify02-53576447384f794a6a4a-build.zip",
+          "agentcoreRuntimeArn": "arn:aws:bedrock-agentcore:us-west-2:975050325676:runtime/agentcore_app5-hzJtlH2rgJ"
+        },
+        "tdx2025dagentcoreinvoke": {
+          "agentcoreArn": "arn:aws:bedrock-agentcore:us-west-2:975050325676:runtime/agentcore_app5-hzJtlH2rgJ",
+          "agentcoreQualifier": "",
+          "invocationMode": "sdk",
+          "jobsBucket": "tdx2025-d-01",
+          "jobsPrefix": "jobs/",
+          "deploymentBucketName": "amplify-frontendagent-dev-4a0c5-deployment",
+          "s3Key": "amplify-builds/tdx2025dagentcoreinvoke-487945427656675a6955-build.zip"
         }
       },
       "api": {

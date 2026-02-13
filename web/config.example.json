@@ -2,3 +2,6 @@
   "PRESIGN_URL": "https://your-api.example.com/presign",
   "PROCESS_URL": "https://your-api.example.com/process"
 }
+
+  "PROCESS_URL": "https://example.execute-api.us-west-2.amazonaws.com/process",
+  "AGENTCORE_URL": "https://example.execute-api.us-west-2.amazonaws.com/agentcore/invoke"

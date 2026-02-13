@@ -42,6 +42,62 @@
     }
   },
   "parameters": {
+    "AMPLIFY_function_tdx2025dagentcoreinvoke_agentcoreArn": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "tdx2025dagentcoreinvoke"
+        }
+      ]
+    },
+    "AMPLIFY_function_tdx2025dagentcoreinvoke_agentcoreQualifier": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "tdx2025dagentcoreinvoke"
+        }
+      ]
+    },
+    "AMPLIFY_function_tdx2025dagentcoreinvoke_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "tdx2025dagentcoreinvoke"
+        }
+      ]
+    },
+    "AMPLIFY_function_tdx2025dagentcoreinvoke_invocationMode": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "tdx2025dagentcoreinvoke"
+        }
+      ]
+    },
+    "AMPLIFY_function_tdx2025dagentcoreinvoke_jobsBucket": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "tdx2025dagentcoreinvoke"
+        }
+      ]
+    },
+    "AMPLIFY_function_tdx2025dagentcoreinvoke_jobsPrefix": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "tdx2025dagentcoreinvoke"
+        }
+      ]
+    },
+    "AMPLIFY_function_tdx2025dagentcoreinvoke_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "tdx2025dagentcoreinvoke"
+        }
+      ]
+    },
     "AMPLIFY_function_tdx2025dlambdaamplify01_bucket": {
       "usedBy": [
         {
@@ -63,6 +119,14 @@
         {
           "category": "function",
           "resourceName": "tdx2025dlambdaamplify01"
+        }
+      ]
+    },
+    "AMPLIFY_function_tdx2025dlambdaamplify02_agentcoreRuntimeArn": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "tdx2025dlambdaamplify02"
         }
       ]
     },
